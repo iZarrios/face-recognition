@@ -8,14 +8,10 @@
 
 import numpy as np
 
-
-# In[3]:
-
-
 class PCA():
-    def __init__(self, alpha):
+    def __init__(self):
         # the percentage of the information that we need
-        self.alpha = alpha
+        pass
         
         
     
@@ -61,12 +57,11 @@ class PCA():
         self.eivec = v
         self.eival_sum = np.sum(w)
         
-#         return w,v
 
     # get projected matrix which contains the new dimensions
     # @parmas None
     # @return projectiom matrix
-    def proj_matrix(self):
+    def calc_proj_matrix(self):
         
         eival_sum = self.eival_sum
         alpha = self.alpha
@@ -81,15 +76,13 @@ class PCA():
             i += 1
         print(i-1)
         self.proj_matrix = eivec[:, :i]
-        print(len(self.proj_matrix))
+        print(i)
 #         return self.proj_matrix
               
     def get_proj_matrix(self):
         return self.proj_matrix
-        
-
     
-    def fit(self, data):
+    def _fit(self, data):
         self.data = np.array(data)
         # get mean matrix
         self.get_mean()
@@ -99,18 +92,15 @@ class PCA():
         self.cov()
         # get eigvals ,eigvecs
         self.calc_eig()
-        # get proj matrix
-        self.proj_matrix()
+
+    
+    def fit(self, data):
+        self.calc_proj_matrix()
         
     def transform(self, X):
         return np.dot(X,self.proj_matrix)
+    
+    def set_alpha(self, alpha):
+        self.alpha = alpha    
         
-        
-        
-
-
-# In[ ]:
-
-
-
 
