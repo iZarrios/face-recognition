@@ -8,56 +8,44 @@ import numpy as np
 
 
 # In[3]:
-
-
 class LDA():
-    
-    def __init__(self,n_components):
+
+    def __init__(self, n_components=2):
         self.n_components = n_components
-        
-        
-        
-    def fit(self,X,y):
-        n_features = X.shape[1]
-        
-        
-        class_labels = np.unique(y)
-         
-        # Sw with in class
-        # Sb between class
-        
-        overall_mean = np.mean(X, axis=0)
-        
-        Sw = np.zeros((n_features, n_features))
-        Sb = np.zeros((n_features, n_features))
-        
-        for c in class_labels:
-            # get all samples with c class
-            X_c = X[y == c] # c, N
-            nk = X_c.shape[0] # 5
-            
-            mean_c = np.mean(X_c,axis=0, keepdims=True)
-            
-            overall_mean = overall_mean.reshape(n_features, 1)
-            
-            Sb += nk * np.dot((mean_c - overall_mean), (mean_c - overall_mean).T)
-            
-            # N,c . c,N
-            Sw += np.dot((X_c - mean_c).T, (X_c - mean_c)) # N, N
-        Sw_inv = np.linalg.inv(Sw)
-        
-        eigVal, eigVec = np.linalg.eigh(np.dot(Sw_inv,Sb))
+
+    def fit(self, X, y):
+        class_labels = np.unique(y)  # should be of size 2
+
+        d1 = X[y == class_labels[0]]
+        d2 = X[y == class_labels[1]]
+
+        mean1 = np.mean(d1, axis=0)
+        mean2 = np.mean(d2, axis=0)
+
+        diff = mean1 - mean2
+
+        Sb = np.dot(diff, diff.T)
+
+        z1 = d1 - mean1.T
+        z2 = d2 - mean2.T
+
+        s1 = np.dot(z1.T, z1)
+        s2 = np.dot(z2, z2.T)
+
+        Sw = s1 + s2
+        S_inv = np.linalg.inv(Sw)
+
+        eigVal, eigVec = np.linalg.eigh(np.dot(S_inv, B))
         eigVal = eigVal[::-1]
         eigVec = eigVec[::-1]
-        
-        eigVec = eigVec.T        
+
+        eigVec = eigVec.T
         self.lin_discriminants = eigVec[:self.n_components]
-    
+
     def get_lin_discriminants(self):
         return self.lin_discriminants
-        
-    def transform(self,X):
-        res = np.dot(X, self.lin_discriminants.T)
-        
-        return res
 
+    def transform(self, X):
+        res = np.dot(X, self.lin_discriminants.T)
+
+        return res
